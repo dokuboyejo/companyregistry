@@ -12,7 +12,7 @@ Usage
 git clone git@github.com:dokuboyejo/companyregistry.git
 cd companyregistry
 mvn clean package jetty:run
-NB: you should be able to access the resources @https://companyregistry.herokuapp.com/companies and @https://companyregistry.herokuapp.com/beneficiaries
+NB: you should be able to access the resources @http://localhost:8080/companyregistry/companies and @http://localhost:8080/companyregistry/beneficiaries
 ```
 
 ##LIVE ACCESS
