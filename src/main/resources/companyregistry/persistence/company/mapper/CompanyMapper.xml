@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="companyregistry.persistence.company.mapper.CompanyMapper">
+    <select id="findCompanyById" parameterType="Long" resultMap="companyResultMap" statementType="CALLABLE">
+        SELECT 
+        	c.id as c_id, c."name", c."address", c."city", c."country", c."email", c."phoneNumber",
+        	b.id as b_id, b."firstName", b."lastName"
+	    FROM 
+	    	public.company as c
+	    LEFT OUTER JOIN
+	    	public.company_beneficiaries as cb
+	    ON
+	    	c.id = cb."companyId"
+	    LEFT OUTER JOIN 
+	    	public.beneficiary as b
+	    ON
+	    	cb."beneficiaryId" = b.id
+	    WHERE
+	    	c.id = #{id,jdbcType=BIGINT};
+    </select>
+    <select id="fetchAllCompanies" resultMap="companyResultMap" resultType="map" statementType="CALLABLE">
+        SELECT 
+        	c.id as c_id, c."name", c."address", c."city", c."country", c."email", c."phoneNumber",
+        	b.id as b_id, b."firstName", b."lastName"
+	    FROM 
+	    	public.company AS c
+	    LEFT OUTER JOIN
+	    	public.company_beneficiaries AS cb
+	    ON
+	    	c.id = cb."companyId"
+	    LEFT OUTER JOIN 
+	    	public.beneficiary AS b
+	    ON
+	    	cb."beneficiaryId" = b.id;
+    </select>
+    <select id="fetchCompanyBeneficiaries" parameterType="Long" resultMap="beneficiaryResultMap" resultType="map" statementType="CALLABLE">
+        SELECT 
+			b.id, 
+		  	b."firstName", 
+		  	b."lastName"
+		FROM 
+		  	public.beneficiary AS b
+		LEFT OUTER JOIN
+			public.company_beneficiaries AS cb
+		ON 
+			b.id = cb."beneficiaryId"
+		LEFT OUTER JOIN
+			public.company AS c
+		ON 
+			cb."companyId" = c.id
+	    WHERE 
+	    	c.id = #{id,jdbcType=BIGINT};
+    </select>
+    
+    <insert id="addCompany" parameterType="companyregistry.domain.company.Company" statementType="CALLABLE">
+        <selectKey order="AFTER" keyProperty="company.id" resultType="Long">
+		    SELECT 
+		    	DISTINCT CURRVAL ('company_id_seq') 
+			FROM
+				company
+		</selectKey>
+        INSERT INTO 
+        	public.company (name, address, city, country, email, "phoneNumber")
+        VALUES (
+        	#{company.name,jdbcType=VARCHAR},
+        	#{company.address,jdbcType=VARCHAR},
+        	#{company.city,jdbcType=VARCHAR},
+        	#{company.country,jdbcType=VARCHAR},
+        	#{company.email,jdbcType=VARCHAR},
+        	#{company.phoneNumber,jdbcType=VARCHAR}
+        );
+    </insert>
+    <!-- important to have this here, despite been present in BeneficiaryMapper also for transaction purpose. Each mapper has 1-1 mapping to transaction -->
+    <insert id="addBeneficiary" parameterType="companyregistry.domain.beneficiary.Beneficiary">
+        <selectKey order="AFTER" keyProperty="beneficiary.id" resultType="Long">
+		    SELECT 
+		    	DISTINCT CURRVAL ('beneficiary_id_seq')
+		    FROM 
+		    	beneficiary
+		</selectKey>
+        INSERT INTO
+        	public.beneficiary ("firstName", "lastName")
+        VALUES (
+        	#{beneficiary.firstName,jdbcType=VARCHAR},
+        	#{beneficiary.lastName,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="addBeneficiaryToCompany" parameterType="companyregistry.domain.CompanyBeneficiary" statementType="CALLABLE">
+        INSERT INTO 
+        	public.company_beneficiaries
+        VALUES( 
+        	#{companyBeneficiary.companyId,jdbcType=BIGINT},
+        	#{companyBeneficiary.beneficiaryId,jdbcType=BIGINT}
+        )
+    </insert>
+    
+    <update id="updateCompanyById" parameterType="companyregistry.domain.company.Company" statementType="CALLABLE">
+        UPDATE 
+        	public.company
+        SET 
+        	name = #{company.name,jdbcType=VARCHAR},
+        	address = #{company.address,jdbcType=VARCHAR},
+        	city = #{company.city,jdbcType=VARCHAR},
+        	country = #{company.country,jdbcType=VARCHAR},
+        	email = #{company.email,jdbcType=VARCHAR},
+        	"phoneNumber" = #{company.phoneNumber,jdbcType=VARCHAR}
+        WHERE 
+        	company.id = #{company.id,jdbcType=VARCHAR}
+    </update>
+    
+    <delete id="deleteCompanyById" parameterType="Long" statementType="CALLABLE">
+        DELETE FROM
+        	public.company
+        WHERE
+        	company.id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteBeneficiaryFromCompany" parameterType="companyregistry.domain.CompanyBeneficiary" statementType="CALLABLE">
+        DELETE FROM
+        	public.company_beneficiaries
+        WHERE
+        	company_beneficiaries."companyId" = #{companyBeneficiary.companyId,jdbcType=BIGINT}
+        AND
+        	company_beneficiaries."beneficiaryId" = #{companyBeneficiary.beneficiaryId,jdbcType=BIGINT}
+    </delete>
+        
+    <resultMap id="companyResultMap" type="companyregistry.domain.company.Company">
+        <id property="id" column="c_id"/>
+        <result property="name" column="name"/>
+        <result property="address" column="address"/>
+        <result property="city" column="city"/>
+        <result property="country" column="country"/>
+        <result property="email" column="email"/>
+        <result property="phoneNumber" column="phoneNumber"/>
+        <collection property="beneficiaries" ofType="companyregistry.domain.beneficiary.Beneficiary" javaType="java.util.List">
+        	<id property="id" column="b_id"/>
+	        <result property="firstName" column="firstName"/>
+	        <result property="lastName" column="lastName"/>
+        </collection>
+    </resultMap>        
+    <resultMap id="beneficiaryResultMap" type="companyregistry.domain.beneficiary.Beneficiary">
+        <id property="id" column="id"/>
+        <result property="firstName" column="firstName"/>
+        <result property="lastName" column="lastName"/>
+    </resultMap>        
+</mapper>

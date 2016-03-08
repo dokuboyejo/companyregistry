@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE configuration
+  PUBLIC '-//mybatis.org//DTD Config 3.0//EN'
+  'http://mybatis.org/dtd/mybatis-3-config.dtd'>
+<configuration>
+
+<!-- 	<typeAliases> -->
+<!-- 		<typeAlias alias='TestBean' type='com.manniwood.beans.TestBean' /> -->
+<!-- 		<typeAlias alias='UUID' type='java.util.UUID' /> -->
+<!-- 		<typeAlias alias='UUIDTypeHandler' -->
+<!-- 			type='com.manniwood.mybatis.typehandlers.UUIDTypeHandler' /> -->
+<!-- 	</typeAliases> -->
+
+<!-- 	<typeHandlers> -->
+<!-- 		<package name='com.manniwood.mybatis.typehandlers' /> -->
+<!-- 	</typeHandlers> -->
+	<properties resource='jdbc.properties'/>
+	
+	<environments default='development'>
+		<environment id='development'>
+			<transactionManager type='JDBC' />
+			<dataSource type='POOLED'>
+				<property name='poolMaximumActiveConnections' value='10' />
+				<property name='poolMaximumIdleConnections' value='5' />
+				<property name='poolMaximumCheckoutTime' value='20000' />  <!-- milliseconds -->
+				<property name='driver' value='${jdbc.driverClassName}' />
+				<property name='url' value='${jdbc.url}' />
+				<property name='username' value='${jdbc.username}' />
+				<property name='password' value='${jdbc.password}' />
+				<property name='defaultTransactionIsolationLevel' value='2' />  <!-- 2 == TRANSACTION_READ_COMMITTED -->
+				<property name='driver.ApplicationName' value='Test App' />
+			</dataSource>
+		</environment>
+	</environments>
+
+	<mappers>
+		<mapper resource='companyregistry/persistence/company/mapper/CompanyMapper.xml' />
+		<mapper resource='companyregistry/persistence/beneficiary/mapper/BeneficiaryMapper.xml' />
+	</mappers>
+
+</configuration>
