@@ -21,8 +21,8 @@ NB: you should be able to access the resources @http://localhost:8080/companyreg
 In each of the curl request, the following are true<br>
 [1] $ represent terminal prompt<br>
 [2] {id} represent a placeholder for either company or beneficiary id<br>
-[3] {c_id} represent a placeholder for either company id<br>
-[3] {b_id} represent a placeholder for either beneficiary id<br>
+[3] {c_id} represent a placeholder for company id<br>
+[3] {b_id} represent a placeholder for beneficiary id<br>
 
 ##COMPANY Resource
 
